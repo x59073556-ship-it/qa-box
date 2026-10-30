@@ -19,23 +19,10 @@ export async function POST(req) {
     }
 
     if (!geminiApiKey) {
-      return Response.json({ error: '找不到 GEMINI_API_KEY，請確認 Vercel 環境變數是否有設定！' }, { status: 500 });
+      return Response.json({ error: '找不到 GEMINI_API_KEY' }, { status: 500 });
     }
 
     const { name, ageGroup, gender, content } = await req.json();
-
-    const lowerContent = (content || '').toLowerCase();
-    const forbiddenWords = [
-      '雞雞', '打手槍', '自慰', '約砲', '胸部', '看胸部', '賣色', '擦邊',
-      '超負荷', '館長', '陳之漢', '統神', 'toyz', '羅傑', 'roger',
-      '幹', '三小', '靠北'
-    ];
-
-    const hasForbiddenWord = forbiddenWords.some(word => lowerContent.includes(word.toLowerCase()));
-
-    if (hasForbiddenWord) {
-      return Response.json({ error: '內容含有不當言論或敏感詞彙，已被系統攔截！' }, { status: 400 });
-    }
 
     const promptText = `你是一個極度嚴格的提問箱審核員。
 請檢查以下內容是否包含任何性暗示、性騷擾、髒話、引戰、爭議人物或不當話題。
@@ -44,7 +31,7 @@ export async function POST(req) {
 
 內容：${content}`;
 
-    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -55,11 +42,12 @@ export async function POST(req) {
     });
 
     if (!geminiRes.ok) {
-      return Response.json({ error: 'AI 審核服務連線失敗，請稍後再試' }, { status: 500 });
+      const errDetail = await geminiRes.text();
+      return Response.json({ error: `AI 審核連線失敗: ${errDetail}` }, { status: 500 });
     }
 
     const geminiData = await geminiRes.json();
-    const aiResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'REJECT';
+    const aiResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'PASS';
 
     if (aiResponse.includes('REJECT') || !aiResponse.includes('PASS')) {
       return Response.json({ error: '內容含有不當言論或不適合的話題，無法送出喔！' }, { status: 400 });
