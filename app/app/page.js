@@ -1,93 +1,103 @@
-import { GoogleGenAI } from '@google/genai';
+'use client';
+import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-export default function Home() {
-  async function handleSubmit(formData) {
-    'use server'
-    const nickname = formData.get('nickname');
-    const ageGroup = formData.get('ageGroup');
-    const gender = formData.get('gender');
-    const content = formData.get('content');
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
 
-    if (!content) return;
+export default function Home() {
+  const [nickname, setNickname] = useState('');
+  const [ageGroup, setAgeGroup] = useState('18-24');
+  const [gender, setGender] = useState('不透露');
+  const [content, setContent] = useState('');
+  const [status, setStatus] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!content.trim()) return;
+    setLoading(true);
+    setStatus('AI 審查中...');
 
     try {
-      // 1. 初始化 Google Gemini API 進行過濾
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const prompt = `
-        你是一個極度嚴格的內容過濾助手，保護創作者的心靈健康。
-        請檢查以下觀眾提問內容：「${content}」
-
-        審查標準：
-        - REJECT：只要包含人身攻擊、酸言酸語、情緒宣洩、惡意挑釁、性騷擾、威脅、或無意義亂碼/單字。
-        - PASS：態度正常、具有建設性、是具體提問或想討論特定主題的好問題。
-
-        請只回傳 JSON 格式：{"result": "PASS" 或 "REJECT"}
-      `;
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: { responseMimeType: "application/json" }
+      // 呼叫 API 進行 Gemini 審查
+      const res = await fetch('/api/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, nickname, ageGroup, gender })
       });
 
-      const analysis = JSON.parse(response.text);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '發送失敗');
 
-      // 2. 如果通過審查 (PASS)，才寫入 Supabase 資料庫
-      if (analysis.result === 'PASS') {
-        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-        await supabase.from('questions').insert([
-          { nickname, age_group: ageGroup, gender, content }
-        ]);
-      }
-    } catch (error) {
-      console.error("審查過程發生錯誤：", error);
+      setStatus('🎉 提問已成功送出！');
+      setContent('');
+      setNickname('');
+    } catch (err) {
+      setStatus(`❌ ${err.message}`);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <main className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">✨ 創作者提問箱</h1>
-        <p className="text-sm text-slate-500 mt-1">有什麼想問的、想聊的，歡迎告訴我！</p>
-      </div>
-
-      <form action={handleSubmit} className="space-y-4">
+    <main style={{ maxWidth: '600px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif' }}>
+      <h1>💬 創作者匿名提問箱</h1>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">稱呼 / 暱稱</label>
-          <input name="nickname" required placeholder="例如：小明" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <label>稱呼：</label><br />
+          <input 
+            type="text" 
+            value={nickname} 
+            onChange={(e) => setNickname(e.target.value)} 
+            placeholder="例如：小明 (選填)"
+            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+          />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">年齡區間</label>
-          <select name="ageGroup" required className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">請選擇年齡</option>
-            <option value="18以下">18歲以下</option>
-            <option value="18~30">18 ~ 30歲</option>
-            <option value="30~39">30 ~ 39歲</option>
-            <option value="40以上">40歲以上</option>
+          <label>年齡區間：</label><br />
+          <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} style={{ width: '100%', padding: '8px', marginTop: '5px' }}>
+            <option value="18歲以下">18歲以下</option>
+            <option value="18-24">18-24 歲</option>
+            <option value="25-34">25-34 歲</option>
+            <option value="35-44">35-44 歲</option>
+            <option value="45歲以上">45歲以上</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">性別</label>
-          <select name="gender" required className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">請選擇性別</option>
-            <option value="女性">女性</option>
-            <option value="男性">男性</option>
-            <option value="不想透露 / 其他">不想透露 / 其他</option>
+          <label>性別：</label><br />
+          <select value={gender} onChange={(e) => setGender(e.target.value)} style={{ width: '100%', padding: '8px', marginTop: '5px' }}>
+            <option value="男">男</option>
+            <option value="女">女</option>
+            <option value="其他/不透露">其他/不透露</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">想問的問題</label>
-          <textarea name="content" required rows="4" placeholder="請輸入你的問題..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          <label>想問的問題：</label><br />
+          <textarea 
+            value={content} 
+            onChange={(e) => setContent(e.target.value)} 
+            rows={5} 
+            placeholder="請輸入你想問的問題..."
+            required
+            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+          />
         </div>
 
-        <button type="submit" className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition shadow-md">
-          送出提問
+        <button 
+          type="submit" 
+          disabled={loading}
+          style={{ padding: '12px', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px' }}
+        >
+          {loading ? '處理中...' : '送出提問'}
         </button>
       </form>
+      {status && <p style={{ marginTop: '15px', fontWeight: 'bold' }}>{status}</p>}
     </main>
   );
 }
