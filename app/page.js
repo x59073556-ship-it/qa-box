@@ -201,4 +201,31 @@ export default function Home() {
             style={{
               marginTop: '6px',
               padding: '14px',
-              background: loading ? '#f8bbd0' : 'linear-gradient(135deg, #ff416c 0%, #ff4
+              background: loading ? '#f8bbd0' : 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '700',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              boxShadow: '0 4px 15px rgba(255, 75, 43, 0.4)',
+            }}
+          >
+            {loading ? '傳送中...' : '送出草莓提問 🍓'}
+          </button>
+        </form>
+
+        {status && (
+          <div style={{
+            marginTop: '20px',
+            padding: '12px',
+            borderRadius: '10px',
+            background: status.includes('❌') ? '#ffebee' : '#e8f5e9',
+            color: status.includes('❌') ? '#c62828' : '#2e7d32',
+            fontSize: '14px',
+            textAlign: 'center',
+            fontWeight: '600',
+          }}>
+            {status}
+          </div>
+        )}
