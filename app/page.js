@@ -10,12 +10,8 @@ const playSuccessSound = () => {
   if (!CREATOR_AUDIO_URL) return;
   try {
     const audio = new Audio(CREATOR_AUDIO_URL);
-    audio.play().catch((e) => {
-      console.log("播放失敗：", e);
-    });
-  } catch (e) {
-    console.log("錯誤：", e);
-  }
+    audio.play().catch(() => {});
+  } catch (e) {}
 };
 
 export default function Home() {
@@ -229,3 +225,7 @@ export default function Home() {
             {status}
           </div>
         )}
+      </div>
+    </main>
+  );
+}
