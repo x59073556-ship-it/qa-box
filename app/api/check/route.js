@@ -1,64 +1,44 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export async function POST(request) {
-  // 抓取環境變數（支援有無 NEXT_PUBLIC_ 前綴）
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-  const apiKey = process.env.GEMINI_API_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ error: 'Supabase 環境變數未設定' }, { status: 500 });
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
+export async function POST(req) {
   try {
-    const { name, ageGroup, gender, content } = await request.json();
+    const { name, ageGroup, gender, content } = await req.json();
 
-    // 呼叫 Gemini REST API 審核內容
-    let isApproved = true;
-    if (apiKey) {
-      try {
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{
-                  text: `請判斷以下提問是否包含人身攻擊、仇恨言論、情色或不當內容。如果是適當提問請只回答 "PASS"，如果是不當內容請只回答 "BLOCK"。\n\n提問內容：${content}`
-                }]
-              }]
-            })
-          }
-        );
-        const geminiData = await geminiRes.json();
-        const replyText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-        if (replyText.includes('BLOCK')) {
-          isApproved = false;
-        }
-      } catch (e) {
-        console.error('Gemini 審核失敗，預設通過:', e);
-      }
+    if (!supabaseUrl || !supabaseKey) {
+      return Response.json({ error: '伺服器未設定 Supabase 網址或金鑰' }, { status: 500 });
     }
 
-    if (!isApproved) {
-      return NextResponse.json({ error: '提問內容未通過 AI 安全審核，請修改後重試。' }, { status: 400 });
+    if (!geminiApiKey) {
+      return Response.json({ error: '伺服器未設定 Gemini API 金鑰' }, { status: 500 });
     }
 
-    // 寫入 Supabase 資料庫
-    const { data, error } = await supabase
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const genAI = new GoogleGenerativeAI(geminiApiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const prompt = `請審核以下提問內容是否包含嚴重謾罵、騷擾、色情或攻擊性內容。如果內容安全，請只回傳 PASS；如果包含不當內容，請只回傳 REJECT。內容：${content}`;
+    const aiResult = await model.generateContent(prompt);
+    const aiResponse = aiResult.response.text().trim();
+
+    if (aiResponse.includes('REJECT')) {
+      return Response.json({ error: '內容含有不當言論，無法送出喔！' }, { status: 400 });
+    }
+
+    const { error: dbError } = await supabase
       .from('questions')
       .insert([{ name, age_group: ageGroup, gender, content }]);
 
-    if (error) {
-      throw error;
+    if (dbError) {
+      return Response.json({ error: dbError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, data });
+    return Response.json({ success: true });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return Response.json({ error: err.message }, { status: 500 });
   }
 }
