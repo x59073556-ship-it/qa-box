@@ -1,12 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Home() {
   const [name, setName] = useState('');
@@ -34,6 +28,8 @@ export default function Home() {
 
       setStatus('提問成功送出！');
       setName('');
+      setAgeGroup('');
+      setGender('');
       setContent('');
     } catch (err) {
       setStatus(`錯誤：${err.message}`);
