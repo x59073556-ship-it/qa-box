@@ -89,9 +89,9 @@ export default function Home() {
           </div>
 
           <h1 style={{ margin: '0 0 6px 0', fontSize: '22px', color: '#d81b60', fontWeight: '700' }}>
-            {CREATOR_NAME} 的草莓兔子提問箱 🍓🐰
+            {CREATOR_NAME} 的提問箱 🐰
           </h1>
-          <p style={{ margin: 0, fontSize: '14px', color: '#ad1457' }}>偷偷把想說的話塞進草莓裡告訴小小吧！</p>
+          <p style={{ margin: 0, fontSize: '14px', color: '#ad1457' }}>偷偷把想說的話塞進草莓裡告訴小小吧！🍓</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
