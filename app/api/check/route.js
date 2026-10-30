@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -17,18 +16,24 @@ export async function POST(req) {
       return Response.json({ error: '伺服器未設定 Gemini API 金鑰' }, { status: 500 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const genAI = new GoogleGenerativeAI(geminiApiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: `請審核以下提問內容是否包含嚴重謾罵、騷擾、色情或攻擊性內容。如果內容安全，請只回傳 PASS；如果包含不當內容，請只回傳 REJECT。內容：${content}` }]
+        }]
+      })
+    });
 
-    const prompt = `請審核以下提問內容是否包含嚴重謾罵、騷擾、色情或攻擊性內容。如果內容安全，請只回傳 PASS；如果包含不當內容，請只回傳 REJECT。內容：${content}`;
-    const aiResult = await model.generateContent(prompt);
-    const aiResponse = aiResult.response.text().trim();
+    const geminiData = await geminiRes.json();
+    const aiResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'PASS';
 
     if (aiResponse.includes('REJECT')) {
       return Response.json({ error: '內容含有不當言論，無法送出喔！' }, { status: 400 });
     }
 
+    const supabase = createClient(supabaseUrl, supabaseKey);
     const { error: dbError } = await supabase
       .from('questions')
       .insert([{ name, age_group: ageGroup, gender, content }]);
