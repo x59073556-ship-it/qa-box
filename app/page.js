@@ -56,7 +56,7 @@ export default function Home() {
   return (
     <main style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #ff9a8b 0%, #ff6a88 55%, #ff99ac 100%)',
+      background: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -69,7 +69,7 @@ export default function Home() {
         maxWidth: '480px',
         borderRadius: '24px',
         padding: '36px',
-        boxShadow: '0 20px 40px rgba(255, 106, 136, 0.25)',
+        boxShadow: '0 20px 40px rgba(255, 154, 158, 0.25)',
       }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{
@@ -78,8 +78,8 @@ export default function Home() {
             margin: '0 auto 14px auto',
             borderRadius: '50%',
             overflow: 'hidden',
-            border: '3px solid #ff6a88',
-            boxShadow: '0 4px 12px rgba(255, 106, 136, 0.3)',
+            border: '3px solid #ff9a9e',
+            boxShadow: '0 4px 12px rgba(255, 154, 158, 0.3)',
           }}>
             <img 
               src={CREATOR_AVATAR} 
@@ -197,14 +197,14 @@ export default function Home() {
             style={{
               marginTop: '6px',
               padding: '14px',
-              background: loading ? '#f8bbd0' : 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)',
+              background: loading ? '#f8bbd0' : 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
               color: '#ffffff',
               border: 'none',
               borderRadius: '12px',
               fontSize: '16px',
               fontWeight: '700',
               cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 15px rgba(255, 75, 43, 0.4)',
+              boxShadow: '0 4px 15px rgba(255, 154, 158, 0.4)',
             }}
           >
             {loading ? '傳送中...' : '送出草莓提問 🍓'}
