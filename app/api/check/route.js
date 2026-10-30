@@ -1,20 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const geminiApiKey = process.env.GEMINI_API_KEY;
-
 export async function POST(req) {
   try {
-    const { name, ageGroup, gender, content } = await req.json();
+    const rawUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const supabaseUrl = rawUrl.replace(/[\[\]"'`]/g, '').trim();
 
-    if (!supabaseUrl || !supabaseKey) {
-      return Response.json({ error: '伺服器未設定 Supabase 網址或金鑰' }, { status: 500 });
+    const rawKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabaseKey = rawKey.replace(/[\[\]"'`]/g, '').trim();
+
+    const geminiApiKey = (process.env.GEMINI_API_KEY || '').replace(/[\[\]"'`]/g, '').trim();
+
+    if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
+      return Response.json({ error: `網址格式不正確，目前讀到的值是: "${rawUrl}"` }, { status: 500 });
+    }
+
+    if (!supabaseKey) {
+      return Response.json({ error: '找不到 Supabase 金鑰' }, { status: 500 });
     }
 
     if (!geminiApiKey) {
-      return Response.json({ error: '伺服器未設定 Gemini API 金鑰' }, { status: 500 });
+      return Response.json({ error: '找不到 Gemini API 金鑰' }, { status: 500 });
     }
+
+    const { name, ageGroup, gender, content } = await req.json();
 
     const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
