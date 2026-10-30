@@ -11,7 +11,7 @@ export async function POST(req) {
     const geminiApiKey = (process.env.GEMINI_API_KEY || '').replace(/[\[\]"'`]/g, '').trim();
 
     if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
-      return Response.json({ error: `網址格式不正確，目前讀到的值是: "${rawUrl}"` }, { status: 500 });
+      return Response.json({ error: 'Supabase 網址設定錯誤' }, { status: 500 });
     }
 
     if (!supabaseKey) {
@@ -19,26 +19,28 @@ export async function POST(req) {
     }
 
     if (!geminiApiKey) {
-      return Response.json({ error: '找不到 Gemini API 金鑰' }, { status: 500 });
+      return Response.json({ error: '找不到 GEMINI_API_KEY，請確認 Vercel 環境變數是否有設定！' }, { status: 500 });
     }
 
     const { name, ageGroup, gender, content } = await req.json();
 
-    const promptText = `你是一個在台灣網路社群（如 Twitch、YouTube、Dcard、PTT）經驗豐富且極度嚴格的提問箱審核員。
-請以「語意與意圖」深度分析以下內容，只要含有以下任何一種意圖，請毫不猶豫回傳 REJECT：
+    const lowerContent = (content || '').toLowerCase();
+    const forbiddenWords = [
+      '雞雞', '打手槍', '自慰', '約砲', '胸部', '看胸部', '賣色', '擦邊',
+      '超負荷', '館長', '陳之漢', '統神', 'toyz', '羅傑', 'roger',
+      '幹', '三小', '靠北'
+    ];
 
-【必須拒絕（回傳 REJECT）】：
-1. 性騷擾、性暗示、下流言語、要求私密照或與性行為相關的挑逗（如打手槍、胸部、約砲、自慰等）。
-2. 髒話、謾罵、人身攻擊、挑釁或威脅言論。
-3. 任何形式的「實況主、網路紅人、公眾人物、政治人物」的爭議話題、評價、八卦、引戰釣魚、迷因梗洗版或政治立場討論（例如問對某個實況主、網紅、政治人物的看法或攻擊）。
-4. 討論 18 禁、擦邊賣色、色情產業相關的價值觀或評價。
+    const hasForbiddenWord = forbiddenWords.some(word => lowerContent.includes(word.toLowerCase()));
 
-【允許通過（回傳 PASS）】：
-1. 提問者真心誠意分享「自己」的身體困擾、心理煩惱、自卑感受（例如：「我覺得我的身材很自卑」等純粹個人心事）。
-2. 一般正常、禮貌的日常生活關心、正向交流與日常話題。
+    if (hasForbiddenWord) {
+      return Response.json({ error: '內容含有不當言論或敏感詞彙，已被系統攔截！' }, { status: 400 });
+    }
 
-請完全發揮你對台灣網路次文化與實況圈語境的理解，判斷這是不是在釣魚、引戰或騷擾。
-請只回傳單字 PASS 或 REJECT，不要包含任何其他文字或標點符號。
+    const promptText = `你是一個極度嚴格的提問箱審核員。
+請檢查以下內容是否包含任何性暗示、性騷擾、髒話、引戰、爭議人物或不當話題。
+只要有一點不妥，請回傳 REJECT，只有百分之百安全才回傳 PASS。
+只回傳單字 PASS 或 REJECT。
 
 內容：${content}`;
 
@@ -52,11 +54,15 @@ export async function POST(req) {
       })
     });
 
-    const geminiData = await geminiRes.json();
-    const aiResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'PASS';
+    if (!geminiRes.ok) {
+      return Response.json({ error: 'AI 審核服務連線失敗，請稍後再試' }, { status: 500 });
+    }
 
-    if (aiResponse.includes('REJECT')) {
-      return Response.json({ error: '內容含有不當言論、引戰話題或不適合的內容，無法送出喔！' }, { status: 400 });
+    const geminiData = await geminiRes.json();
+    const aiResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'REJECT';
+
+    if (aiResponse.includes('REJECT') || !aiResponse.includes('PASS')) {
+      return Response.json({ error: '內容含有不當言論或不適合的話題，無法送出喔！' }, { status: 400 });
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
