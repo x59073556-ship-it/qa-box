@@ -44,7 +44,7 @@ export async function POST(req) {
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { error: dbError } = await supabase
       .from('questions')
-      .insert([{ name, age_group: ageGroup, gender, content }]);
+      .insert([{ nickname: name, age_group: ageGroup, gender, content }]);
 
     if (dbError) {
       return Response.json({ error: dbError.message }, { status: 500 });
