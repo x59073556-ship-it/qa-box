@@ -34,7 +34,13 @@ export default function Home() {
         body: JSON.stringify({ name, ageGroup, gender, content }),
       });
 
-      const data = await res.json();
+      const responseText = await res.text();
+      let data = {};
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (err) {
+        throw new Error(responseText || '伺服器回應格式錯誤');
+      }
 
       if (!res.ok) {
         throw new Error(data.error || '送出失敗');
