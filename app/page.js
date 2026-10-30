@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <main style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #fceade 0%, #f1d3b3 50%, #d49a6a 100%)',
+      background: 'linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #ffd1dc 100%)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -73,17 +73,17 @@ export default function Home() {
         maxWidth: '480px',
         borderRadius: '24px',
         padding: '36px',
-        boxShadow: '0 20px 40px rgba(110, 70, 40, 0.15)',
+        boxShadow: '0 20px 40px rgba(255, 182, 193, 0.3)',
       }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{
-            width: '80px',
-            height: '80px',
+            width: '84px',
+            height: '84px',
             margin: '0 auto 14px auto',
             borderRadius: '50%',
             overflow: 'hidden',
-            border: '3px solid #b87333',
-            boxShadow: '0 4px 12px rgba(184, 115, 51, 0.3)',
+            border: '3px solid #ffb6c1',
+            boxShadow: '0 4px 12px rgba(255, 182, 193, 0.4)',
           }}>
             <img 
               src={CREATOR_AVATAR} 
@@ -92,36 +92,37 @@ export default function Home() {
             />
           </div>
 
-          <h1 style={{ margin: '0 0 6px 0', fontSize: '22px', color: '#4a3525', fontWeight: '700' }}>
-            {CREATOR_NAME} 的匿名提問箱 🧋
+          <h1 style={{ margin: '0 0 6px 0', fontSize: '22px', color: '#5a4a42', fontWeight: '700' }}>
+            {CREATOR_NAME} 的兔子提問箱 🐰
           </h1>
-          <p style={{ margin: 0, fontSize: '14px', color: '#8c6d53' }}>有什麼想對我說的或想問的嗎？大膽問吧！</p>
+          <p style={{ margin: 0, fontSize: '14px', color: '#8b7d7b' }}>偷偷投遞你想問的事給小小吧 🥕</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>你的稱呼</label>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#6d5952' }}>你的稱呼</label>
             <input
               type="text"
-              placeholder="例如：神秘路人、小明"
+              placeholder="例如：神秘小兔、小明"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               style={{
                 width: '100%',
                 padding: '12px 16px',
-                borderRadius: '10px',
-                border: '1px solid #dcd0c0',
+                borderRadius: '12px',
+                border: '1px solid #f8d7da',
                 fontSize: '15px',
                 outline: 'none',
                 boxSizing: 'border-box',
+                background: '#fffcfc',
               }}
             />
           </div>
 
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>年齡區間</label>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#6d5952' }}>年齡區間</label>
               <select
                 value={ageGroup}
                 onChange={(e) => setAgeGroup(e.target.value)}
@@ -129,10 +130,10 @@ export default function Home() {
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  borderRadius: '10px',
-                  border: '1px solid #dcd0c0',
+                  borderRadius: '12px',
+                  border: '1px solid #f8d7da',
                   fontSize: '15px',
-                  background: '#fff',
+                  background: '#fffcfc',
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
@@ -147,7 +148,7 @@ export default function Home() {
             </div>
 
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>性別</label>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#6d5952' }}>性別</label>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
@@ -155,10 +156,10 @@ export default function Home() {
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  borderRadius: '10px',
-                  border: '1px solid #dcd0c0',
+                  borderRadius: '12px',
+                  border: '1px solid #f8d7da',
                   fontSize: '15px',
-                  background: '#fff',
+                  background: '#fffcfc',
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
@@ -172,9 +173,9 @@ export default function Home() {
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>問題內容</label>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#6d5952' }}>問題內容</label>
             <textarea
-              placeholder="輸入你的問題或想說的話..."
+              placeholder="輸入你的問題，跳進兔子洞吧..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
@@ -182,13 +183,14 @@ export default function Home() {
               style={{
                 width: '100%',
                 padding: '12px 16px',
-                borderRadius: '10px',
-                border: '1px solid #dcd0c0',
+                borderRadius: '12px',
+                border: '1px solid #f8d7da',
                 fontSize: '15px',
                 outline: 'none',
                 resize: 'vertical',
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
+                background: '#fffcfc',
               }}
             />
           </div>
@@ -199,17 +201,17 @@ export default function Home() {
             style={{
               marginTop: '6px',
               padding: '14px',
-              background: loading ? '#dcd0c0' : 'linear-gradient(135deg, #b87333 0%, #6b3e26 100%)',
-              color: '#fff',
+              background: loading ? '#f2d6dc' : 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+              color: '#ffffff',
               border: 'none',
-              borderRadius: '10px',
+              borderRadius: '12px',
               fontSize: '16px',
-              fontWeight: '600',
+              fontWeight: '700',
               cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 12px rgba(107, 62, 38, 0.3)',
+              boxShadow: '0 4px 15px rgba(255, 154, 158, 0.4)',
             }}
           >
-            {loading ? '傳送中...' : '送出匿名提問 🧋'}
+            {loading ? '傳送中...' : '把紅蘿蔔提問送出去 🥕'}
           </button>
         </form>
 
@@ -217,9 +219,9 @@ export default function Home() {
           <div style={{
             marginTop: '20px',
             padding: '12px',
-            borderRadius: '8px',
-            background: status.includes('❌') ? '#fdf2f2' : '#f4f9f4',
-            color: status.includes('❌') ? '#a63a3a' : '#3b6e3b',
+            borderRadius: '10px',
+            background: status.includes('❌') ? '#fff0f0' : '#f0fff4',
+            color: status.includes('❌') ? '#d9534f' : '#47a447',
             fontSize: '14px',
             textAlign: 'center',
             fontWeight: '600',
