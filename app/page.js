@@ -91,7 +91,7 @@ export default function Home() {
           <h1 style={{ margin: '0 0 6px 0', fontSize: '22px', color: '#d81b60', fontWeight: '700' }}>
             {CREATOR_NAME} 的提問箱 🐰
           </h1>
-          <p style={{ margin: 0, fontSize: '14px', color: '#ad1457' }}>偷偷把想說的話塞進草莓裡告訴小小吧！🍓</p>
+          <p style={{ margin: 0, fontSize: '14px', color: '#ad1457' }}>有什麼想對我說的或想問的嗎？大膽問吧！🍓</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
@@ -99,7 +99,7 @@ export default function Home() {
             <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#880e4f' }}>你的稱呼</label>
             <input
               type="text"
-              placeholder="例如：草莓小兔、小明"
+              placeholder="例如：神秘路人、小明"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -171,7 +171,7 @@ export default function Home() {
           <div>
             <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#880e4f' }}>問題內容</label>
             <textarea
-              placeholder="輸入你的問題，和草莓兔子一起分享..."
+              placeholder="輸入你的問題或想說的話..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
@@ -207,7 +207,7 @@ export default function Home() {
               boxShadow: '0 4px 15px rgba(255, 154, 158, 0.4)',
             }}
           >
-            {loading ? '傳送中...' : '送出草莓提問 🍓'}
+            {loading ? '傳送中...' : '送出匿名提問 🍓'}
           </button>
         </form>
 
