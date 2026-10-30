@@ -2,23 +2,19 @@
 
 import { useState } from 'react';
 
-// ==========================
-// 💡 小小專屬設定
-// ==========================
 const CREATOR_NAME = "小小"; 
-const CREATOR_AVATAR = "/avatar.jpg"; // 對應你在 public 夾裡的頭貼檔名
-const CREATOR_AUDIO_URL = "/my-voice.mp3"; // 對應你在 public 夾裡的錄音檔名
+const CREATOR_AVATAR = "/avatar.jpg"; 
+const CREATOR_AUDIO_URL = "/my-voice.mp3"; 
 
-// 播放你的專屬聲音檔
 const playSuccessSound = () => {
   if (!CREATOR_AUDIO_URL) return;
   try {
     const audio = new Audio(CREATOR_AUDIO_URL);
     audio.play().catch((e) => {
-      console.log("瀏覽器阻擋自動播放音效：", e);
+      console.log("播放失敗：", e);
     });
   } catch (e) {
-    console.log("播放音效失敗：", e);
+    console.log("錯誤：", e);
   }
 };
 
@@ -48,7 +44,7 @@ export default function Home() {
         throw new Error(data.error || '送出失敗');
       }
 
-      playSuccessSound(); // 🎤 播放你的聲音！
+      playSuccessSound();
       setStatus('✨ 提問成功送出！');
       setName('');
       setAgeGroup('');
@@ -64,7 +60,7 @@ export default function Home() {
   return (
     <main style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #fceade 0%, #f1d3b3 50%, #d49a6a 100%)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -77,18 +73,17 @@ export default function Home() {
         maxWidth: '480px',
         borderRadius: '24px',
         padding: '36px',
-        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+        boxShadow: '0 20px 40px rgba(110, 70, 40, 0.15)',
       }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          {/* 🖼️ 圓形大頭貼 */}
           <div style={{
             width: '80px',
             height: '80px',
             margin: '0 auto 14px auto',
             borderRadius: '50%',
             overflow: 'hidden',
-            border: '3px solid #667eea',
-            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+            border: '3px solid #b87333',
+            boxShadow: '0 4px 12px rgba(184, 115, 51, 0.3)',
           }}>
             <img 
               src={CREATOR_AVATAR} 
@@ -97,15 +92,15 @@ export default function Home() {
             />
           </div>
 
-          <h1 style={{ margin: '0 0 6px 0', fontSize: '22px', color: '#1a202c', fontWeight: '700' }}>
-            {CREATOR_NAME} 的匿名提問箱 📮
+          <h1 style={{ margin: '0 0 6px 0', fontSize: '22px', color: '#4a3525', fontWeight: '700' }}>
+            {CREATOR_NAME} 的匿名提問箱 🧋
           </h1>
-          <p style={{ margin: 0, fontSize: '14px', color: '#718096' }}>有什麼想對我說的或想問的嗎？大膽問吧！</p>
+          <p style={{ margin: 0, fontSize: '14px', color: '#8c6d53' }}>有什麼想對我說的或想問的嗎？大膽問吧！</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#4a5568' }}>你的稱呼</label>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>你的稱呼</label>
             <input
               type="text"
               placeholder="例如：神秘路人、小明"
@@ -116,7 +111,7 @@ export default function Home() {
                 width: '100%',
                 padding: '12px 16px',
                 borderRadius: '10px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #dcd0c0',
                 fontSize: '15px',
                 outline: 'none',
                 boxSizing: 'border-box',
@@ -126,7 +121,7 @@ export default function Home() {
 
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#4a5568' }}>年齡區間</label>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>年齡區間</label>
               <select
                 value={ageGroup}
                 onChange={(e) => setAgeGroup(e.target.value)}
@@ -135,7 +130,7 @@ export default function Home() {
                   width: '100%',
                   padding: '12px 16px',
                   borderRadius: '10px',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #dcd0c0',
                   fontSize: '15px',
                   background: '#fff',
                   outline: 'none',
@@ -152,7 +147,7 @@ export default function Home() {
             </div>
 
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#4a5568' }}>性別</label>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>性別</label>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
@@ -161,7 +156,7 @@ export default function Home() {
                   width: '100%',
                   padding: '12px 16px',
                   borderRadius: '10px',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #dcd0c0',
                   fontSize: '15px',
                   background: '#fff',
                   outline: 'none',
@@ -177,7 +172,7 @@ export default function Home() {
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#4a5568' }}>問題內容</label>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#5c4033' }}>問題內容</label>
             <textarea
               placeholder="輸入你的問題或想說的話..."
               value={content}
@@ -188,7 +183,7 @@ export default function Home() {
                 width: '100%',
                 padding: '12px 16px',
                 borderRadius: '10px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #dcd0c0',
                 fontSize: '15px',
                 outline: 'none',
                 resize: 'vertical',
@@ -204,17 +199,17 @@ export default function Home() {
             style={{
               marginTop: '6px',
               padding: '14px',
-              background: loading ? '#cbd5e0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: loading ? '#dcd0c0' : 'linear-gradient(135deg, #b87333 0%, #6b3e26 100%)',
               color: '#fff',
               border: 'none',
               borderRadius: '10px',
               fontSize: '16px',
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+              boxShadow: '0 4px 12px rgba(107, 62, 38, 0.3)',
             }}
           >
-            {loading ? '傳送中...' : '送出匿名提問 🚀'}
+            {loading ? '傳送中...' : '送出匿名提問 🧋'}
           </button>
         </form>
 
@@ -223,8 +218,8 @@ export default function Home() {
             marginTop: '20px',
             padding: '12px',
             borderRadius: '8px',
-            background: status.includes('❌') ? '#fff5f5' : '#f0fff4',
-            color: status.includes('❌') ? '#c53030' : '#2f855a',
+            background: status.includes('❌') ? '#fdf2f2' : '#f4f9f4',
+            color: status.includes('❌') ? '#a63a3a' : '#3b6e3b',
             fontSize: '14px',
             textAlign: 'center',
             fontWeight: '600',
