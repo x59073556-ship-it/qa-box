@@ -30,6 +30,16 @@ export async function POST(req) {
       return Response.json({ error: '提問內容必須超過 100 個字才能發送！' }, { status: 400 });
     }
 
+    const hasTooManyRepeats = /(.)\1{7,}/.test(cleanContent);
+    if (hasTooManyRepeats) {
+      return Response.json({ error: '提問內容包含過多重複字元，請輸入有意義的提問內容喔！' }, { status: 400 });
+    }
+
+    const pureText = cleanContent.replace(/[\s\u3000]/g, '');
+    if (pureText.length < 80) {
+      return Response.json({ error: '有效文字內容不足 100 字（請勿用空白或無意義符號灌水）！' }, { status: 400 });
+    }
+
     const lowerContent = cleanContent.toLowerCase();
     const forbiddenWords = [
       '打手槍', '自慰', '約砲', '賣色',
